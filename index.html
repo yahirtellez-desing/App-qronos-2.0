@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0e27" />
+  <meta name="description" content="QRONOS 2.0 · Dashboard ejecutivo de eficiencias industriales con IA" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="QRONOS" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="msapplication-TileColor" content="#0a0e27" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="QRONOS 2.0 · Eficiencia Inteligente" />
+  <meta property="og:description" content="Dashboard ejecutivo de eficiencias industriales con IA en tiempo real" />
+  <meta property="og:type" content="website" />
+
+  <title>QRONOS 2.0 · Eficiencia Inteligente</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Apple Touch Icons (placeholder paths — replace with real icons) -->
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/styles.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     SPLASH SCREEN
+══════════════════════════════════════════════════ -->
+<div id="splash" role="status" aria-label="Cargando QRONOS">
+  <div class="splash-logo">⚡ QRONOS 2.0</div>
+  <div class="splash-sub">LO HACEMOS POSIBLE</div>
+  <div class="splash-spinner" aria-hidden="true"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ── HEADER ─────────────────────────────────── -->
+  <header role="banner">
+    <div class="header-brand">
+      <div>
+        <div class="header-logo">⚡ QRONOS 2.0</div>
+        <div class="header-tagline">Eficiencia Inteligente · Lo Hacemos Posible</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div id="status-dot" class="status-dot" title="Estado de conexión" aria-label="En línea"></div>
+      <button id="btn-install" class="btn-icon hidden" title="Instalar App" aria-label="Instalar aplicación">📲</button>
+      <button id="btn-sync" class="btn-icon" title="Sincronizar datos" aria-label="Sincronizar">🔄</button>
+      <button id="btn-add" class="btn btn-primary" aria-label="Agregar registro">
+        <span aria-hidden="true">＋</span> Registro
+      </button>
+    </div>
+  </header>
+
+  <!-- ── VOICE STATUS BAR ────────────────────────── -->
+  <div id="voice-status" class="voice-status" role="status" aria-live="polite">
+    <div class="voice-wave" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    Escuchando… Di tu comando
+  </div>
+
+  <!-- ── NAVIGATION TABS ────────────────────────── -->
+  <nav class="nav-tabs" role="tablist" aria-label="Secciones">
+    <button class="tab-btn active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="tab-dashboard">
+      📊 Dashboard
+    </button>
+    <button class="tab-btn" data-tab="plantas" role="tab" aria-selected="false" aria-controls="tab-plantas">
+      🏭 Plantas
+    </button>
+    <button class="tab-btn" data-tab="afectaciones" role="tab" aria-selected="false" aria-controls="tab-afectaciones">
+      ⚠️ Afectaciones
+    </button>
+    <button class="tab-btn" data-tab="chat" role="tab" aria-selected="false" aria-controls="tab-chat">
+      🤖 IA Chat
+    </button>
+  </nav>
+
+  <!-- ── MAIN CONTENT ───────────────────────────── -->
+  <main class="content" role="main">
+
+    <!-- ================================================
+         TAB: DASHBOARD
+    ================================================ -->
+    <section id="tab-dashboard" class="tab-panel active" role="tabpanel" aria-labelledby="">
+
+      <!-- KPI Grid -->
+      <div id="kpi-grid" class="kpi-grid" aria-label="Indicadores clave de desempeño">
+        <!-- Rendered by JS -->
+        <div class="skeleton skeleton-kpi"></div>
+        <div class="skeleton skeleton-kpi"></div>
+        <div class="skeleton skeleton-kpi"></div>
+        <div class="skeleton skeleton-kpi"></div>
+      </div>
+
+      <!-- Weekly Chart -->
+      <div class="card chart-card">
+        <div class="section-header">
+          <span class="section-title">Tendencia 14 Días</span>
+          <span class="text-xs text-muted" id="chart-date-range"></span>
+        </div>
+        <p class="text-xs text-muted" style="margin-bottom:8px">
+          Los días con ⛔ representan paros de producción y <strong>no penalizan el KPI global</strong>.
+        </p>
+        <div class="chart-wrapper">
+          <canvas id="chart-weekly" aria-label="Gráfica de tendencia semanal de eficiencias"></canvas>
+        </div>
+      </div>
+
+      <!-- Group Summaries -->
+      <div class="section-header">
+        <span class="section-title">Resumen por Grupo</span>
+        <span class="text-xs text-muted">Promedio 7 días</span>
+      </div>
+      <div id="groups-grid" class="groups-grid">
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+
+    </section>
+
+    <!-- ================================================
+         TAB: PLANTAS
+    ================================================ -->
+    <section id="tab-plantas" class="tab-panel" role="tabpanel">
+
+      <div class="section-header" style="margin-bottom:16px">
+        <span class="section-title">Todas las Plantas</span>
+        <button class="btn btn-ghost text-sm" onclick="openNewModal()">＋ Nuevo</button>
+      </div>
+
+      <!-- Azteca group header -->
+      <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <span style="color:#00b4ff;font-weight:700;font-size:0.85rem">● Grupo Azteca</span>
+      </div>
+
+      <div id="plants-grid" class="plants-grid">
+        <!-- Rendered by JS -->
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+
+    </section>
+
+    <!-- ================================================
+         TAB: AFECTACIONES
+    ================================================ -->
+    <section id="tab-afectaciones" class="tab-panel" role="tabpanel">
+      <div id="afect-container">
+        <div class="skeleton skeleton-card" style="margin-bottom:12px"></div>
+        <div class="skeleton skeleton-card" style="margin-bottom:12px"></div>
+      </div>
+    </section>
+
+    <!-- ================================================
+         TAB: IA CHAT
+    ================================================ -->
+    <section id="tab-chat" class="tab-panel" role="tabpanel">
+
+      <!-- Quick action chips -->
+      <div class="chat-quick-actions" role="group" aria-label="Comandos rápidos">
+        <button class="chat-quick-btn quick-action" data-msg="Dame un resumen ejecutivo de eficiencias de la semana">📊 Resumen semanal</button>
+        <button class="chat-quick-btn quick-action" data-msg="¿Cuál es la mejor planta esta semana y por qué?">🏆 Mejor planta</button>
+        <button class="chat-quick-btn quick-action" data-msg="¿Cuál es la planta con menor eficiencia y qué recomiendan hacer?">⚠️ Planta crítica</button>
+        <button class="chat-quick-btn quick-action" data-msg="Analiza las afectaciones registradas y dame recomendaciones accionables">🔧 Análisis de afectaciones</button>
+        <button class="chat-quick-btn quick-action" data-msg="¿Cuáles plantas estuvieron detenidas esta semana?">⛔ Paros de planta</button>
+        <button class="chat-quick-btn quick-action" data-msg="¿Qué tendencias detectas en los últimos 14 días?">📈 Tendencias</button>
+      </div>
+
+      <div class="chat-container">
+        <div id="chat-messages" class="chat-messages" role="log" aria-live="polite" aria-label="Conversación con IA">
+          <!-- Messages rendered by JS -->
+        </div>
+
+        <div class="chat-input-row">
+          <input
+            id="chat-input-field"
+            type="text"
+            class="chat-input"
+            placeholder="Pregunta sobre eficiencias, afectaciones, tendencias…"
+            aria-label="Escribe tu pregunta"
+            maxlength="500"
+          />
+          <button id="btn-chat-send" class="btn btn-primary" aria-label="Enviar mensaje">
+            ➤
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+</div><!-- #app -->
+
+<!-- ══════════════════════════════════════════════════
+     FLOATING VOICE BUTTON
+══════════════════════════════════════════════════ -->
+<button id="btn-voice" class="voice-btn" title="Activar comandos de voz" aria-label="Comandos de voz">
+  🎤
+</button>
+<div class="voice-btn-label" aria-hidden="true">
+  Comandos de voz · "Qronos, resumen"
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     MODAL: ADD / EDIT RECORD
+══════════════════════════════════════════════════ -->
+<div id="modal-record" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-handle" aria-hidden="true"></div>
+    <div class="flex justify-between items-center" style="margin-bottom:20px">
+      <h2 class="modal-title" id="modal-title" style="margin:0">Registrar Eficiencia</h2>
+      <button class="btn-icon" data-close-modal="modal-record" aria-label="Cerrar modal">✕</button>
+    </div>
+
+    <form id="form-record" novalidate>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="modal-planta">Planta *</label>
+          <select id="modal-planta" name="planta" class="form-control" required aria-required="true">
+            <optgroup label="Azteca">
+              <option value="Caldos">Caldos</option>
+              <option value="Liquidos">Líquidos</option>
+              <option value="Promociones">Promociones</option>
+            </optgroup>
+            <optgroup label="RTD's">
+              <option value="Krones Pet">Krones Pet</option>
+              <option value="Krones Lata">Krones Lata</option>
+              <option value="SIDEL">SIDEL</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="modal-fecha">Fecha *</label>
+          <input
+            id="modal-fecha" name="fecha" type="date"
+            class="form-control" required aria-required="true"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="modal-eficiencia">Eficiencia % *
+            <span style="color:var(--text-muted);font-weight:400">(0 = paro)</span>
+          </label>
+          <input
+            id="modal-eficiencia" name="eficiencia" type="number"
+            class="form-control" min="0" max="100" step="0.1"
+            placeholder="ej. 73.5" required aria-required="true"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="modal-meta">Meta %</label>
+          <input
+            id="modal-meta" name="meta" type="number"
+            class="form-control" min="0" max="100" step="0.1"
+            placeholder="ej. 73"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="modal-afectaciones">Afectaciones / Notas</label>
+        <textarea
+          id="modal-afectaciones" name="afectaciones"
+          class="form-control" rows="3"
+          placeholder="Describe brevemente las causas de baja eficiencia o paros…"
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button" class="btn btn-ghost"
+          data-close-modal="modal-record"
+        >Cancelar</button>
+        <button id="btn-save-record" type="submit" class="btn btn-primary">
+          Guardar Registro
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TOAST NOTIFICATION
+══════════════════════════════════════════════════ -->
+<div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+<!-- App Script -->
+<script src="/app.js"></script>
+
+<script>
+  // Update chart date range label
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('chart-date-range');
+    if (el) {
+      const now = new Date();
+      const past = new Date(); past.setDate(past.getDate() - 13);
+      const fmt = (d) => d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
+      el.textContent = `${fmt(past)} — ${fmt(now)}`;
+    }
+  });
+</script>
+
+</body>
+</html>
